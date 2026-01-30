@@ -1,0 +1,62 @@
+PROJECT OVERVIEW
+Project Title: Charity Crowdfunding System
+Tech Stack: MERN (MongoDB, Express, React, Node.js)
+PROBLEM STATEMENT
+Many people with genuine causes struggle to reach potential donors. Traditional fundraising lacks transparency, and donors cannot easily verify campaigns. There is no system to track donations or provide instant updates, leading to trust issues and delayed contributions.
+PROPOSED SOLUTION
+A web application where campaign creators can post verified charitable campaigns. Donors can browse causes, contribute online, and track the status of their donations. Admins approve campaigns and ensure authenticity, making the platform secure and transparent.
+USER ROLES & PERMISSIONS
+A. Donor:
+Register and Login
+Browse all campaigns
+Donate to campaigns
+Track donation history
+B. Campaign Creator:
+Register and Login
+Create campaigns with descriptions, images, and documents
+View donations received
+Request fund withdrawal
+C. Admin:
+Login to Admin Dashboard
+Approve/Reject campaigns
+Monitor donations and users
+Maintain platform security
+DATABASE STRUCTURE (Schemas)
+A. User Schema:
+Name (String)
+Email (String, Unique)
+Password (Hashed)
+Role (String: 'donor', 'creator', 'admin')
+B. Campaign Schema:
+Title (String)
+Description (String)
+GoalAmount (Number)
+RaisedAmount (Number, Default: 0)
+CreatorID (Reference to User)
+Documents (Array of Strings)
+Status (String: 'Pending', 'Approved', 'Rejected', 'Completed')
+CreatedAt (Timestamp)
+C. Donation Schema:
+CampaignID (Reference to Campaign)
+DonorID (Reference to User)
+Amount (Number)
+PaymentStatus (String: 'Success', 'Failed')
+CreatedAt (Timestamp)
+FEATURE WORKFLOW (The "User Journey")
+Login/Register: Users authenticate and land on the dashboard.
+Browse Campaigns: Donors see verified campaigns with goal and raised amount.
+Donate: Donor selects a campaign, enters donation amount, and pays online (or via mock gateway).
+Database: Donation record is created in MongoDB; campaign’s raised amount updates.
+Admin Approval: Admin verifies new campaigns or flagged donations.
+Updates: Donors and creators receive status updates in real-time.
+Withdrawal: Creator requests fund withdrawal after campaign completion.
+API ENDPOINTS (The URL Rules)
+POST /api/auth/register  → Create new user
+POST /api/auth/login     → Login user
+GET  /api/campaigns      → List all campaigns
+POST /api/campaigns      → Create a new campaign
+PUT  /api/campaigns/:id  → Update campaign (Creator/Admin)
+PUT  /api/campaigns/approve/:id → Approve campaign (Admin)
+POST /api/donations      → Make a donation
+GET  /api/donations/user/:id → Donor donation history
+GET  /api/donations/campaign/:id → Donations for a campaign
