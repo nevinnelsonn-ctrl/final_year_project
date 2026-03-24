@@ -22,6 +22,21 @@ const campaignSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    campaignType: {
+      type: String,
+      enum: ['Charity', 'Disaster'],
+      default: 'Charity',
+    },
+    disasterType: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    location: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

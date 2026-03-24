@@ -1,0 +1,350 @@
+# Data Flow Diagrams (DFD) – Integrated Charity Crowdfunding, Disaster Management & Food Donation System
+
+This file contains Mermaid code for DFD Level 0, Level 1, and Level 1.1–1.n (by role/module) as per project_spec.txt. Copy each code block into a Mermaid-supported editor (e.g. Mermaid Live, GitHub, Notion) to render the diagram.
+
+---
+
+## DFD Level 0 (Context Diagram – Entire Project)
+
+The system is shown as a single process. External entities are Donor, Campaign Creator/NGO, Volunteer, Admin, and Guest. All interactions with the system flow through this one process.
+
+```mermaid
+flowchart LR
+    subgraph External_Entities
+        DONOR[Donor]
+        CREATOR[Campaign Creator / NGO]
+        VOL[Volunteer]
+        ADMIN[Admin]
+        GUEST[Guest / Public]
+    end
+
+    subgraph System
+        SYS(("Integrated Charity & Disaster Relief System"))
+    end
+
+    DONOR -->|"Register, Login, Donate money/food, View history"| SYS
+    SYS -->|"Campaigns, Donation confirmations, History"| DONOR
+
+    CREATOR -->|"Register, Login, Create/Update campaigns, View funds"| SYS
+    SYS -->|"Campaign status, Donations received"| CREATOR
+
+    VOL -->|"Register, Login, View tasks, Accept/Update task status"| SYS
+    SYS -->|"Assigned tasks, Food/disaster requests"| VOL
+
+    ADMIN -->|"Login, Approve/Reject campaigns, Manage users, Assign volunteers"| SYS
+    SYS -->|"Dashboard, Users, Campaigns, Tasks"| ADMIN
+
+    GUEST -->|"View campaigns, Browse food donations, Register/Login"| SYS
+    SYS -->|"Campaign list, Food donation list"| GUEST
+```
+
+---
+
+## DFD Level 1 (Entire Project – First Decomposition)
+
+Level 1 breaks the system into major processes and shows data stores. Flows are simplified for readability.
+
+```mermaid
+flowchart TB
+    subgraph External_Entities
+        DONOR[Donor]
+        CREATOR[Campaign Creator]
+        VOL[Volunteer]
+        ADMIN[Admin]
+        GUEST[Guest]
+    end
+
+    subgraph Processes
+        P1(("1.0 Authentication"))
+        P2(("2.0 Campaign Management"))
+        P3(("3.0 Donation Management"))
+        P4(("4.0 Food Donation"))
+        P5(("5.0 Volunteer Task Management"))
+        P6(("6.0 Admin Management"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1 Users"))]
+        D2[(("D2 Campaigns"))]
+        D3[(("D3 Donations"))]
+        D4[(("D4 Food Donations"))]
+        D5[(("D5 Volunteer Tasks"))]
+    end
+
+    DONOR -->|Credentials, Donation data| P1
+    DONOR -->|View, Donate| P2
+    DONOR -->|Amount, CampaignId| P3
+    DONOR -->|Food details| P4
+    P1 -->|Session, User info| DONOR
+    P2 -->|Campaign list/detail| DONOR
+    P3 -->|Receipt, History| DONOR
+
+    CREATOR -->|Credentials, Campaign data| P1
+    CREATOR -->|Create/Update campaign| P2
+    P1 -->|Session| CREATOR
+    P2 -->|Campaign status, Funds received| CREATOR
+
+    VOL -->|Credentials| P1
+    VOL -->|Task status updates| P5
+    P1 -->|Session| VOL
+    P5 -->|Assigned tasks| VOL
+
+    ADMIN -->|Credentials, Approve/Reject, Assign| P1
+    ADMIN -->|Approval decisions| P2
+    ADMIN -->|Assign task| P5
+    P6 -->|Dashboard, Users, Tasks| ADMIN
+
+    GUEST -->|View request| P2
+    GUEST -->|View request| P4
+    GUEST -->|Register| P1
+    P2 -->|Campaign list| GUEST
+    P4 -->|Food donation list| GUEST
+
+    P1 <--> D1
+    P2 <--> D2
+    P3 <--> D2
+    P3 <--> D3
+    P4 <--> D4
+    P5 <--> D5
+    P6 <--> D1
+    P6 <--> D2
+    P6 <--> D5
+```
+
+---
+
+## DFD Level 1.1 – Guest / Public User
+
+Guest can view campaigns and food donations; can register or login to participate. No data store write from guest except via Authentication.
+
+```mermaid
+flowchart TB
+    subgraph External
+        GUEST[Guest / Public User]
+    end
+
+    subgraph Guest_Processes
+        G1(("1.1.1 View Campaigns"))
+        G2(("1.1.2 Browse Food Donations"))
+        G3(("1.1.3 Register or Login"))
+    end
+
+    subgraph Data_Stores
+        D2[(("Campaigns"))]
+        D4[(("Food Donations"))]
+        D1[(("Users"))]
+    end
+
+    GUEST -->|"Request list/filter"| G1
+    GUEST -->|"Request list"| G2
+    GUEST -->|"Credentials / Registration data"| G3
+
+    G1 -->|"Campaign list, Campaign detail"| GUEST
+    G2 -->|"Food donation list"| GUEST
+    G3 -->|"Session, Redirect"| GUEST
+
+    G1 --> D2
+    D2 --> G1
+    G2 --> D4
+    D4 --> G2
+    G3 --> D1
+    D1 --> G3
+```
+
+---
+
+## DFD Level 1.2 – Donor
+
+Donor: register/login, view campaigns, donate money, donate food, view donation history.
+
+```mermaid
+flowchart TB
+    subgraph External
+        DONOR[Donor]
+    end
+
+    subgraph Donor_Processes
+        D1(("1.2.1 Login / Register"))
+        D2(("1.2.2 View Campaigns"))
+        D3(("1.2.3 Donate Money"))
+        D4(("1.2.4 Donate Food"))
+        D5(("1.2.5 View Donation History"))
+    end
+
+    subgraph Data_Stores
+        DS1[(("Users"))]
+        DS2[(("Campaigns"))]
+        DS3[(("Donations"))]
+        DS4[(("Food Donations"))]
+    end
+
+    DONOR -->|Credentials| D1
+    DONOR -->|View request| D2
+    DONOR -->|CampaignId, Amount| D3
+    DONOR -->|FoodType, Quantity, Expiry, Location| D4
+    DONOR -->|History request| D5
+
+    D1 -->|Session| DONOR
+    D2 -->|Campaign list/detail| DONOR
+    D3 -->|Confirmation| DONOR
+    D4 -->|Confirmation| DONOR
+    D5 -->|Donation list| DONOR
+
+    D1 <--> DS1
+    D2 <--> DS2
+    D3 --> DS3
+    D3 --> DS2
+    D4 --> DS4
+    D5 <--> DS3
+```
+
+---
+
+## DFD Level 1.3 – Campaign Creator / NGO
+
+Creator: register/login, create/update campaigns, view funds and food donations received, (optionally) post updates, request withdrawal.
+
+```mermaid
+flowchart TB
+    subgraph External
+        CREATOR[Campaign Creator / NGO]
+    end
+
+    subgraph Creator_Processes
+        C1(("1.3.1 Login / Register"))
+        C2(("1.3.2 Create Campaign"))
+        C3(("1.3.3 Update Campaign"))
+        C4(("1.3.4 View Funds & Donations Received"))
+        C5(("1.3.5 Post Updates / Request Withdrawal"))
+    end
+
+    subgraph Data_Stores
+        DS1[(("Users"))]
+        DS2[(("Campaigns"))]
+        DS3[(("Donations"))]
+        DS4[(("Food Donations"))]
+    end
+
+    CREATOR -->|Credentials| C1
+    CREATOR -->|Title, Description, Goal, Type, Documents| C2
+    CREATOR -->|Campaign updates| C3
+    CREATOR -->|Request report| C4
+    CREATOR -->|Update / Withdrawal request| C5
+
+    C1 -->|Session| CREATOR
+    C2 -->|Campaign created| CREATOR
+    C3 -->|Campaign updated| CREATOR
+    C4 -->|Funds summary, Donation list| CREATOR
+    C5 -->|Confirmation| CREATOR
+
+    C1 <--> DS1
+    C2 --> DS2
+    C3 <--> DS2
+    C4 <--> DS2
+    C4 <--> DS3
+    C4 <--> DS4
+    C5 <--> DS2
+```
+
+---
+
+## DFD Level 1.4 – Volunteer
+
+Volunteer: register/login, view disaster and food donation requests, accept tasks, update task status (Assigned → In Progress → Completed).
+
+```mermaid
+flowchart TB
+    subgraph External
+        VOL[Volunteer]
+    end
+
+    subgraph Volunteer_Processes
+        V1(("1.4.1 Login / Register"))
+        V2(("1.4.2 View Disaster & Food Donation Requests"))
+        V3(("1.4.3 View Assigned Tasks"))
+        V4(("1.4.4 Update Task Status"))
+    end
+
+    subgraph Data_Stores
+        DS1[(("Users"))]
+        DS4[(("Food Donations"))]
+        DS5[(("Volunteer Tasks"))]
+        DS2[(("Campaigns"))]
+    end
+
+    VOL -->|Credentials| V1
+    VOL -->|Browse request| V2
+    VOL -->|My tasks request| V3
+    VOL -->|New status| V4
+
+    V1 -->|Session| VOL
+    V2 -->|Disaster alerts, Food requests| VOL
+    V3 -->|Task list| VOL
+    V4 -->|Updated task| VOL
+
+    V1 <--> DS1
+    V2 <--> DS4
+    V2 <--> DS2
+    V3 <--> DS5
+    V4 <--> DS5
+```
+
+---
+
+## DFD Level 1.5 – Admin
+
+Admin: login, approve/reject campaigns, manage users and volunteers, assign volunteers, monitor donations and platform activity.
+
+```mermaid
+flowchart TB
+    subgraph External
+        ADMIN[Admin]
+    end
+
+    subgraph Admin_Processes
+        A1(("1.5.1 Login"))
+        A2(("1.5.2 Approve / Reject Campaigns"))
+        A3(("1.5.3 Manage Users & Volunteers"))
+        A4(("1.5.4 Assign Volunteers to Tasks"))
+        A5(("1.5.5 Monitor Donations & Activity"))
+    end
+
+    subgraph Data_Stores
+        DS1[(("Users"))]
+        DS2[(("Campaigns"))]
+        DS3[(("Donations"))]
+        DS4[(("Food Donations"))]
+        DS5[(("Volunteer Tasks"))]
+    end
+
+    ADMIN -->|Credentials| A1
+    ADMIN -->|Approve/Reject decision| A2
+    ADMIN -->|User/volunteer management actions| A3
+    ADMIN -->|VolunteerId, TaskType, Location| A4
+    ADMIN -->|Dashboard/report request| A5
+
+    A1 -->|Session| ADMIN
+    A2 -->|Campaign status updated| ADMIN
+    A3 -->|User list, Updated| ADMIN
+    A4 -->|Task assigned| ADMIN
+    A5 -->|Dashboard, Donations, Activity| ADMIN
+
+    A1 <--> DS1
+    A2 <--> DS2
+    A3 <--> DS1
+    A4 --> DS5
+    A4 <--> DS1
+    A5 <--> DS2
+    A5 <--> DS3
+    A5 <--> DS4
+    A5 <--> DS5
+```
+
+---
+
+## Notes for Mermaid Rendering
+
+- Use a Mermaid-compatible viewer (e.g. https://mermaid.live, GitHub markdown, or VS Code Mermaid extension).
+- If a diagram is too wide, wrap the code in a `flowchart TB` and keep external entities at top and processes below, or split into smaller diagrams.
+- Data store shape `[(("Label"))]` renders as a cylinder-style node; you can replace with `[(Label)]` if your viewer differs.
+- To number processes in Level 1.1–1.5 to match your report, keep the numbering (e.g. 1.2.1, 1.2.2) as-is in the process labels.

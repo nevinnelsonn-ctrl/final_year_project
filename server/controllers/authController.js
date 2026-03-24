@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       // allow explicit role only if it is valid; otherwise default from schema
-      role: role && ['donor', 'creator', 'admin'].includes(role) ? role : undefined,
+      role: role && ['donor', 'creator', 'volunteer', 'admin'].includes(role) ? role : undefined,
     });
 
     const token = generateToken(user);
@@ -102,9 +102,30 @@ const loginUser = async (req, res) => {
   }
 };
 
+// @desc    Get current user
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = async (req, res) => {
+  try {
+    const user = req.user; // set by protect middleware
+    return res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error('GetMe error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getMe,
 };
 
 

@@ -1,0 +1,95 @@
+# Database Schema – Integrated Charity Crowdfunding, Disaster Management & Food Donation System
+
+Database: MongoDB (Mongoose ODM).  
+All tables use automatic timestamps: createdAt (Date), updatedAt (Date).
+
+---
+
+## Table: User
+
+**Collection name:** users
+
+| Field Name | Data Type    | Constraints                    | Required | Description                                      |
+|------------|--------------|---------------------------------|----------|--------------------------------------------------|
+| name       | String       | trim                            | Yes      | Full name of the user                            |
+| email      | String       | unique, trim, lowercase         | Yes      | Email address; used for login                    |
+| password   | String       | minlength: 6                    | Yes      | Hashed password (e.g. bcrypt)                    |
+| role       | String       | enum: donor, creator, volunteer, admin; default: donor | No  | User role in the system                    |
+| createdAt  | Date         | (auto)                          | —        | Record creation time                             |
+| updatedAt  | Date         | (auto)                          | —        | Last update time                                 |
+
+---
+
+## Table: Campaign
+
+**Collection name:** campaigns
+
+| Field Name  | Data Type    | Constraints                                      | Required | Description                                      |
+|-------------|--------------|---------------------------------------------------|----------|--------------------------------------------------|
+| title       | String       | trim                                              | Yes      | Campaign title                                   |
+| description | String       | trim                                              | Yes      | Campaign description                             |
+| goalAmount  | Number       | min: 0                                            | Yes      | Target amount to raise (e.g. in ₹)               |
+| raisedAmount| Number       | min: 0, default: 0                                | No       | Amount raised so far                             |
+| campaignType| String       | enum: Charity, Disaster; default: Charity         | No       | Type of campaign                                 |
+| disasterType| String      | trim, default: ''                                 | No       | Type of disaster (if campaignType is Disaster)   |
+| location    | String       | trim, default: ''                                 | No       | Geographic or operational location               |
+| creator     | ObjectId     | ref: User                                         | Yes      | User who created the campaign                    |
+| documents   | Array of String | trim (each element)                            | No       | Verification documents / file references         |
+| status      | String       | enum: Pending, Approved, Rejected, Completed; default: Pending | No | Campaign approval/workflow status        |
+| createdAt   | Date         | (auto)                                            | —        | Record creation time                             |
+| updatedAt   | Date         | (auto)                                            | —        | Last update time                                 |
+
+---
+
+## Table: Donation
+
+**Collection name:** donations
+
+| Field Name    | Data Type | Constraints                    | Required | Description                                      |
+|---------------|-----------|---------------------------------|----------|--------------------------------------------------|
+| campaign      | ObjectId  | ref: Campaign                   | Yes      | Campaign to which the donation is made           |
+| donor         | ObjectId  | ref: User                       | Yes      | User who made the donation                       |
+| amount        | Number    | min: 1                          | Yes      | Donation amount (e.g. in ₹)                      |
+| paymentStatus | String    | enum: Success, Failed; default: Success | No  | Payment outcome for the donation                |
+| createdAt     | Date      | (auto)                          | —        | Record creation time                             |
+| updatedAt     | Date      | (auto)                          | —        | Last update time                                 |
+
+---
+
+## Table: FoodDonation
+
+**Collection name:** fooddonations
+
+| Field Name     | Data Type | Constraints                                      | Required | Description                                      |
+|----------------|-----------|---------------------------------------------------|----------|--------------------------------------------------|
+| donor          | ObjectId  | ref: User                                         | Yes      | User donating the food                           |
+| foodType       | String    | trim                                              | Yes      | Type or description of food                      |
+| quantity       | Number    | min: 1                                            | Yes      | Quantity (e.g. units or kg)                      |
+| expiryTime     | Date      | —                                                 | Yes      | Expiry date/time of the food                     |
+| pickupLocation | String    | trim                                              | Yes      | Where the food can be picked up                  |
+| status         | String    | enum: Available, Picked, Delivered; default: Available | No  | Current status of the food donation        |
+| createdAt      | Date      | (auto)                                            | —        | Record creation time                             |
+| updatedAt      | Date      | (auto)                                            | —        | Last update time                                 |
+
+---
+
+## Table: VolunteerTask
+
+**Collection name:** volunteertasks
+
+| Field Name      | Data Type | Constraints                                      | Required | Description                                      |
+|-----------------|-----------|---------------------------------------------------|----------|--------------------------------------------------|
+| volunteer       | ObjectId  | ref: User                                         | Yes      | User (volunteer) assigned to the task            |
+| taskType        | String    | enum: Food, Disaster                              | Yes      | Type of task (food pickup/delivery or disaster)  |
+| assignedLocation| String    | trim                                              | Yes      | Location where the task is to be performed       |
+| status          | String    | enum: Assigned, In Progress, Completed; default: Assigned | No  | Current status of the task                 |
+| createdAt       | Date      | (auto)                                            | —        | Record creation time                             |
+| updatedAt       | Date      | (auto)                                            | —        | Last update time                                 |
+
+---
+
+## Relationship Summary
+
+- **User** is referenced by: Campaign (creator), Donation (donor), FoodDonation (donor), VolunteerTask (volunteer).
+- **Campaign** is referenced by: Donation (campaign).
+- All **ObjectId** fields create an index-friendly reference to the referenced collection; referential integrity is enforced at the application layer.

@@ -1,17 +1,29 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../controllers/authController');
-
 const router = express.Router();
+const { registerUser, loginUser, getMe } = require('../controllers/authController');
+const { protect } = require('../middleware/authMiddleware');
+const { validate, isRequired, minLength, isEmail } = require('../middleware/validate');
 
-// @route   POST /api/auth/register
-// @desc    Register a new user
-// @access  Public
-router.post('/register', registerUser);
+// Public
+router.post(
+  '/register',
+  validate({
+    name: [isRequired],
+    email: [isRequired, isEmail],
+    password: [isRequired, minLength(6)],
+  }),
+  registerUser
+);
+router.post(
+  '/login',
+  validate({
+    email: [isRequired, isEmail],
+    password: [isRequired],
+  }),
+  loginUser
+);
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
-router.post('/login', loginUser);
+// Private (requires valid JWT)
+router.get('/me', protect, getMe);
 
 module.exports = router;
-

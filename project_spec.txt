@@ -1,62 +1,146 @@
-PROJECT OVERVIEW
-Project Title: Charity Crowdfunding System
+# Integrated Charity Crowdfunding, Disaster Management & Food Donation System
+
+1. PROJECT OVERVIEW
+
+---
+
+Project Title: Integrated Charity Crowdfunding, Disaster Management & Food Donation System
 Tech Stack: MERN (MongoDB, Express, React, Node.js)
-PROBLEM STATEMENT
-Many people with genuine causes struggle to reach potential donors. Traditional fundraising lacks transparency, and donors cannot easily verify campaigns. There is no system to track donations or provide instant updates, leading to trust issues and delayed contributions.
-PROPOSED SOLUTION
-A web application where campaign creators can post verified charitable campaigns. Donors can browse causes, contribute online, and track the status of their donations. Admins approve campaigns and ensure authenticity, making the platform secure and transparent.
-USER ROLES & PERMISSIONS
+
+2. PROBLEM STATEMENT
+
+---
+
+Many individuals and organizations face difficulty in raising funds and resources for genuine charitable causes and disaster relief. During natural disasters, lack of coordination delays financial aid, food distribution, and volunteer support. At the same time, surplus food from restaurants, hostels, and events is wasted while many people remain hungry. Existing systems operate independently, resulting in inefficiency, lack of transparency, and reduced trust among donors.
+
+3. PROPOSED SOLUTION
+
+---
+
+A unified web application that allows users to donate money, manage disaster relief campaigns, and contribute excess food through a single platform. Donors can track contributions, NGOs can request and manage aid, volunteers can assist in relief operations, and admins ensure verification and coordination. The system improves transparency, faster response, and effective resource utilization.
+
+4. USER ROLES & PERMISSIONS
+
+---
+
 A. Donor:
-Register and Login
-Browse all campaigns
-Donate to campaigns
-Track donation history
-B. Campaign Creator:
-Register and Login
-Create campaigns with descriptions, images, and documents
-View donations received
-Request fund withdrawal
-C. Admin:
-Login to Admin Dashboard
-Approve/Reject campaigns
-Monitor donations and users
-Maintain platform security
-DATABASE STRUCTURE (Schemas)
+
+* Can Register and Login.
+* Can View charity and disaster campaigns.
+* Can Donate money (normal or anonymous).
+* Can Donate food with quantity and expiry details.
+* Can View donation history and status.
+
+B. Campaign Creator / NGO:
+
+* Can Register and Login.
+* Can Create charity or disaster relief campaigns.
+* Can Upload verification documents and images.
+* Can View funds and food donations received.
+* Can Post campaign updates.
+* Can Request fund withdrawal.
+
+C. Volunteer:
+
+* Can Register and Login.
+* Can View nearby disaster and food donation requests.
+* Can Accept pickup or delivery tasks.
+* Can Update task status (Assigned → In Progress → Completed).
+
+D. Admin:
+
+* Can Login (Secure Admin Dashboard).
+* Can Approve or Reject campaigns and NGOs.
+* Can Manage users and volunteers.
+* Can Assign volunteers during disasters.
+* Can Monitor donations, food distribution, and platform activity.
+
+E. Guest / Public User:
+
+* Can View active campaigns and disaster alerts.
+* Can Browse food donation requests.
+* Can Share campaigns.
+* Can Register or Login to participate.
+
+5. DATABASE STRUCTURE (Schemas)
+
+---
+
 A. User Schema:
-Name (String)
-Email (String, Unique)
-Password (Hashed)
-Role (String: 'donor', 'creator', 'admin')
+
+* Name (String)
+* Email (String, Unique)
+* Password (Hashed)
+* Role (String: 'donor', 'creator', 'volunteer', 'admin')
+
 B. Campaign Schema:
-Title (String)
-Description (String)
-GoalAmount (Number)
-RaisedAmount (Number, Default: 0)
-CreatorID (Reference to User)
-Documents (Array of Strings)
-Status (String: 'Pending', 'Approved', 'Rejected', 'Completed')
-CreatedAt (Timestamp)
+
+* Title (String)
+* Description (String)
+* GoalAmount (Number)
+* RaisedAmount (Number)
+* CampaignType (String: Charity / Disaster)
+* DisasterType (Optional String)
+* Location (String)
+* CreatorID (Reference to User)
+* Documents (Array)
+* Status (String: 'Pending', 'Approved', 'Rejected', 'Completed')
+* CreatedAt (Timestamp)
+
 C. Donation Schema:
-CampaignID (Reference to Campaign)
-DonorID (Reference to User)
-Amount (Number)
-PaymentStatus (String: 'Success', 'Failed')
-CreatedAt (Timestamp)
-FEATURE WORKFLOW (The "User Journey")
-Login/Register: Users authenticate and land on the dashboard.
-Browse Campaigns: Donors see verified campaigns with goal and raised amount.
-Donate: Donor selects a campaign, enters donation amount, and pays online (or via mock gateway).
-Database: Donation record is created in MongoDB; campaign’s raised amount updates.
-Admin Approval: Admin verifies new campaigns or flagged donations.
-Updates: Donors and creators receive status updates in real-time.
-Withdrawal: Creator requests fund withdrawal after campaign completion.
-API ENDPOINTS (The URL Rules)
-POST /api/auth/register  → Create new user
-POST /api/auth/login     → Login user
-GET  /api/campaigns      → List all campaigns
-POST /api/campaigns      → Create a new campaign
-PUT  /api/campaigns/:id  → Update campaign (Creator/Admin)
-PUT  /api/campaigns/approve/:id → Approve campaign (Admin)
-POST /api/donations      → Make a donation
-GET  /api/donations/user/:id → Donor donation history
-GET  /api/donations/campaign/:id → Donations for a campaign
+
+* CampaignID (Reference to Campaign)
+* DonorID (Reference to User)
+* Amount (Number)
+* PaymentStatus (String: 'Success', 'Failed')
+* CreatedAt (Timestamp)
+
+D. Food Donation Schema:
+
+* DonorID (Reference to User)
+* FoodType (String)
+* Quantity (Number)
+* ExpiryTime (DateTime)
+* PickupLocation (String)
+* Status (String: 'Available', 'Picked', 'Delivered')
+* CreatedAt (Timestamp)
+
+E. Volunteer Task Schema:
+
+* VolunteerID (Reference to User)
+* TaskType (String: 'Food', 'Disaster')
+* AssignedLocation (String)
+* Status (String: 'Assigned', 'In Progress', 'Completed')
+* CreatedAt (Timestamp)
+
+6. FEATURE WORKFLOW (The "User Journey")
+
+---
+
+1. Login: User registers or logs into the system.
+
+2. Browse: Donor browses charity campaigns, disaster relief requests, or food donation options.
+
+3. Donate: User donates money or food through the platform.
+
+4. Database: Donation or food data is stored in MongoDB with appropriate status.
+
+5. Admin View: Admin verifies campaigns and assigns volunteers if required.
+
+6. Action: Volunteers complete assigned tasks and update the status.
+
+7. Feedback: Donors and campaign creators receive real-time status updates.
+
+8. API ENDPOINTS (The URL Rules)
+
+---
+
+* POST /api/auth/register            -> Create new user
+* POST /api/auth/login               -> Login user
+* GET  /api/campaigns                -> Get list of campaigns
+* POST /api/campaigns                -> Create new campaign
+* PUT  /api/campaigns/:id            -> Update campaign (Creator/Admin)
+* PUT  /api/campaigns/approve/:id    -> Approve campaign (Admin only)
+* POST /api/donations                -> Donate money
+* POST /api/food-donations           -> Create food donation
+* GET  /api/tasks/volunteer/:id      -> View volunteer tasks
