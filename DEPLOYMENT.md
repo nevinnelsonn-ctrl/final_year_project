@@ -90,6 +90,25 @@ Your frontend uses `VITE_API_URL` to call endpoints like:
 - `${VITE_API_URL}/api/campaigns`
 - `${VITE_API_URL}/api/auth/login`
 
+### 4.3 Fix Vercel 404 on refresh/back/forward (React Router)
+
+For Single Page Apps, direct navigation to routes like `/admin`, `/campaigns/123` must be rewritten to `index.html`.
+
+This project includes `client/vercel.json`:
+
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+If you already deployed before adding this file:
+1. Push this change to GitHub
+2. In Vercel, trigger a redeploy (or wait for auto-deploy)
+3. Test hard refresh on `/admin` and `/campaigns/...`
+
 ---
 
 ## 5) CORS (How to avoid “blocked by CORS” and 404-at-frontend issues)
